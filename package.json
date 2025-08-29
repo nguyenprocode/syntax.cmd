@@ -1,0 +1,13 @@
+{
+  "name": "web-cmd",
+  "version": "1.0.0",
+  "description": "Simple web CMD with Socket.IO (workspace isolated)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
