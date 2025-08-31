@@ -164,13 +164,7 @@ setInterval(() => {
     method: 'GET'
   };
 
-  const req = http.request(options, res => {
-    console.log(`Ping status code: ${res.statusCode}`);
-  });
-
-  req.on('error', error => {
-    console.error('Ping error:', error);
-  });
-
+  const req = http.request(options, () => {});
+  req.on('error', () => {});
   req.end();
 }, 60 * 1000);
