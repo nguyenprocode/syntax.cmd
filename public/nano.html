@@ -1,157 +1,204 @@
 <!DOCTYPE html>
-<html lang="vi">    
-<head>    
-  <meta charset="UTF-8" />    
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nano Editor - Thanh Nguyên</title>    
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;600&display=swap" rel="stylesheet" />    
-  <style>    
-    * { box-sizing: border-box; margin: 0; padding: 0; }    
-    body {    
-      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;    
-      min-height: 100vh;    
-      display: flex;    
-      justify-content: center;    
-      align-items: center;    
-      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb, #fbc2eb, #a6c1ee);    
-      background-size: 1200% 1200%;    
-      animation: gradientShift 25s ease infinite;    
-      padding: 1rem;
-    }    
-    @keyframes gradientShift {    
-      0% { background-position: 0% 50%; }    
-      50% { background-position: 100% 50%; }    
-      100% { background-position: 0% 50%; }    
+  <title>Nano Editor - Thanh Nguyên</title>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    .nano-box {    
-      max-width: 800px;    
-      width: 100%;    
-      height: 90vh;    
-      border-radius: 16px;    
-      overflow: hidden;    
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);    
-      background: #2a2a2a;    
-      display: flex;    
-      flex-direction: column;    
-    }    
+    body {
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb, #fbc2eb, #a6c1ee);
+      background-size: 1200% 1200%;
+      animation: gradientShift 25s ease infinite;
+      padding: 1rem;
+    }
 
-    .nano-header {    
-      background: #333333;    
-      padding: 0.5rem 1rem;    
-      position: relative;    
-      border-bottom: 1px solid #444;    
-      display: flex;    
-      align-items: center;    
-      justify-content: center;    
-    }    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-    .window-controls {    
-      position: absolute;    
-      left: 1rem;    
-      display: flex;    
-      gap: 0.5rem;    
-    }    
+    .nano-box {
+      max-width: 800px;
+      width: 100%;
+      height: 90vh;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      background: #2a2a2a;
+      display: flex;
+      flex-direction: column;
+    }
 
-    .dot {    
-      width: 14px; height: 14px; border-radius: 50%;    
-      transition: transform 0.2s ease;    
-    }    
-    .dot:hover { transform: scale(1.3); }    
-    .dot.red { background: #ff605c; }    
-    .dot.yellow { background: #ffbd44; }    
-    .dot.green { background: #00ca4e; }    
+    .nano-header {
+      background: #333333;
+      padding: 0.5rem 1rem;
+      position: relative;
+      border-bottom: 1px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    .nano-title {    
-      color: #fff;    
-      font-size: 1rem;    
-      text-align: center;    
-    }    
+    .window-controls {
+      position: absolute;
+      left: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
 
-    .nano-body {    
-      flex: 1;    
-      padding: 0.75rem;    
-      background: #252525;    
-      color: #d4d4d4;    
-      overflow-y: auto;    
-    }    
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
 
-    .nano-body textarea {    
-      width: 100%;    
-      height: 100%;    
-      background: transparent;    
-      border: none;    
-      resize: none;    
-      font-family: 'SF Pro Text', monospace;    
-      font-size: 1rem;    
-      color: #d4d4d4;    
-      outline: none;    
-      padding: 0;    
-      caret-color: #ffffff;    
-    }    
+    .dot:hover {
+      transform: scale(1.3);
+    }
 
-    .nano-footer {    
-      padding: 0.5rem 1rem;    
-      background: #333333;    
-      border-top: 1px solid #444;    
-      text-align: right;    
-      display: flex;    
-      justify-content: flex-end;    
-      flex-wrap: wrap;    
-      gap: 0.5rem;    
-    }    
+    .dot.red { background: #ff605c; }
+    .dot.yellow { background: #ffbd44; }
+    .dot.green { background: #00ca4e; }
 
-    .nano-footer button {    
-      padding: 0.6rem 1rem;    
-      background: #3a3a3a;    
-      border: 1px solid #555;    
-      border-radius: 6px;    
-      color: #d4d4d4;    
-      cursor: pointer;    
-      font-family: 'SF Pro Text', sans-serif;    
-      font-size: 0.95rem;    
-      transition: background 0.2s ease, transform 0.2s ease;    
-    }    
+    .nano-title {
+      color: #fff;
+      font-size: 1rem;
+      text-align: center;
+    }
 
-    .nano-footer button:hover {    
-      background: #4a4a4a;    
-      transform: translateY(-1px);    
-    }    
+    .nano-body {
+      flex: 1;
+      background: #252525;
+      color: #d4d4d4;
+      overflow: hidden;
+      padding: 0;
+    }
 
-    .nano-footer button:active {    
-      transform: translateY(0);    
-      background: #333333;    
+    .nano-body textarea {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      resize: none;
+      font-family: 'SF Pro Text', monospace;
+      font-size: 1rem;
+      color: #d4d4d4;
+      outline: none;
+      caret-color: #ffffff;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0.75rem;
+      box-sizing: border-box;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+      scrollbar-width: thin;
+      scrollbar-color: #444 #252525;
+    }
+
+    .nano-body textarea::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .nano-body textarea::-webkit-scrollbar-track {
+      background: #252525;
+    }
+
+    .nano-body textarea::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 4px;
+    }
+
+    .nano-body textarea::-webkit-scrollbar-thumb:hover {
+      background-color: #666;
+    }
+
+    .nano-footer {
+      padding: 0.5rem 1rem;
+      background: #333333;
+      border-top: 1px solid #444;
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .nano-footer button {
+      padding: 0.6rem 1rem;
+      background: #3a3a3a;
+      border: 1px solid #555;
+      border-radius: 6px;
+      color: #d4d4d4;
+      cursor: pointer;
+      font-family: 'SF Pro Text', sans-serif;
+      font-size: 0.95rem;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .nano-footer button:hover {
+      background: #4a4a4a;
+      transform: translateY(-1px);
+    }
+
+    .nano-footer button:active {
+      transform: translateY(0);
+      background: #333333;
     }
 
     @media (max-width: 500px) {
-      .nano-body textarea { font-size: 0.9rem; }
-      .nano-footer button { font-size: 0.85rem; padding: 0.5rem 0.8rem; }
-      .nano-title { font-size: 0.9rem; }
+      .nano-body textarea {
+        font-size: 0.9rem;
+      }
+
+      .nano-footer button {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.8rem;
+      }
+
+      .nano-title {
+        font-size: 0.9rem;
+      }
     }
-  </style>    
-</head>    
-<body>    
-  <div class="nano-box">    
-    <div class="nano-header">    
-      <div class="window-controls">    
-        <div class="dot red"></div>    
-        <div class="dot yellow"></div>    
-        <div class="dot green"></div>    
-      </div>    
-      <span class="nano-title" id="nanoFileName"></span>    
-    </div>    
-    <div class="nano-body">    
-      <textarea id="nanoContent"></textarea>    
-    </div>    
-    <div class="nano-footer">    
+  </style>
+</head>
+<body>
+  <div class="nano-box">
+    <div class="nano-header">
+      <div class="window-controls">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <span class="nano-title" id="nanoFileName"></span>
+    </div>
+
+    <div class="nano-body">
+      <textarea id="nanoContent"></textarea>
+    </div>
+
+    <div class="nano-footer">
       <button onclick="undo()">Undo</button>
       <button onclick="redo()">Redo</button>
-      <button onclick="saveNanoContent()">Save</button>    
-      <button onclick="window.close()">Close</button>    
-    </div>    
-  </div>      
+      <button onclick="saveNanoContent()">Save</button>
+      <button onclick="window.close()">Close</button>
+    </div>
+  </div>
 
-  <script src="/socket.io/socket.io.js"></script>      
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const nanoFileName = document.getElementById("nanoFileName");
@@ -173,7 +220,11 @@
     });
 
     function escapeHTML(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
     }
 
     function saveNanoContent() {
@@ -221,6 +272,10 @@
         redo();
       }
     });
-  </script>    
-</body>    
+
+    window.onload = () => {
+      nanoContent.focus();
+    };
+  </script>
+</body>
 </html>
