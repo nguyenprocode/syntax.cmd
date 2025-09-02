@@ -71,6 +71,10 @@ io.on("connection", (socket) => {
 
     if (cmd.trim().startsWith("nano ")) {
       const fileName = cmd.trim().slice(5).trim();
+      if (!isSafeFileName(fileName)) {
+        socket.emit("output", "Error: Invalid or unsafe file name.");
+        return;
+      }
       const filePath = path.join(currentDir, fileName);
       if (!filePath.startsWith(sandboxDir)) {
         socket.emit("output", "Error: Cannot access files outside storage.");
@@ -99,6 +103,10 @@ io.on("connection", (socket) => {
 
   socket.on("nano_load", (data) => {
     const fileName = data.file;
+    if (!isSafeFileName(fileName)) {
+      socket.emit("output", "Error: Invalid or unsafe file name.");
+      return;
+    }
     const filePath = path.join(workingDirs.get(socket.id), fileName);
 
     if (!filePath.startsWith(sandboxDir)) {
@@ -116,6 +124,10 @@ io.on("connection", (socket) => {
 
   socket.on("nano_save", (data) => {
     const { file, content } = data;
+    if (!isSafeFileName(file)) {
+      socket.emit("output", "Error: Invalid or unsafe file name.");
+      return;
+    }
     const filePath = path.join(workingDirs.get(socket.id), file);
 
     if (!filePath.startsWith(sandboxDir)) {
@@ -133,6 +145,12 @@ io.on("connection", (socket) => {
     workingDirs.delete(socket.id);
   });
 });
+
+function isSafeFileName(fileName) {
+  if (!fileName || typeof fileName !== 'string') return false;
+  const safePattern = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};:'",.<>/?\\|`~]+$/;
+  return safePattern.test(fileName) && !fileName.includes('..');
+}
 
 function formatWindowsPath(dir) {
   const relativePath = path.relative(sandboxDir, dir);
