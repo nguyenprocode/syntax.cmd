@@ -10,19 +10,16 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static(__dirname + "/public"));
-
+const WEB_VERSION = "1.0.0";
 const sandboxDir = path.join(__dirname, "storage");
 if (!fs.existsSync(sandboxDir)) fs.mkdirSync(sandboxDir);
 
 setInterval(() => {
   fs.readdir(sandboxDir, (err, files) => {
-    if (err) return console.error("Error reading storage:", err);
+    if (err) return;
     for (const file of files) {
       const filePath = path.join(sandboxDir, file);
-      fs.rm(filePath, { recursive: true, force: true }, (err) => {
-        if (err) console.error("Error deleting:", filePath, err);
-      });
+      fs.rm(filePath, { recursive: true, force: true }, () => {});
     }
   });
 }, 86400000);
@@ -34,13 +31,16 @@ io.on("connection", (socket) => {
 
   socket.on("command", (cmd) => {
     if (!cmd || cmd.trim() === "") return;
-
     let currentDir = workingDirs.get(socket.id);
+
+    if (cmd.trim().toLowerCase() === "version") {
+      socket.emit("output", `Web version: ${WEB_VERSION}`);
+      return;
+    }
 
     if (cmd.trim().startsWith("cd ")) {
       const targetDir = cmd.trim().slice(3).trim();
       let newDir;
-
       if (targetDir === "" || targetDir === ".") {
         socket.emit("output", `Current directory: ${currentDir}`);
         socket.emit("current_path", formatWindowsPath(currentDir));
@@ -52,17 +52,14 @@ io.on("connection", (socket) => {
       } else {
         newDir = path.resolve(currentDir, targetDir);
       }
-
       if (!newDir.startsWith(sandboxDir)) {
         socket.emit("output", "Error: Cannot navigate outside the storage directory.");
         return;
       }
-
       if (!fs.existsSync(newDir) || !fs.statSync(newDir).isDirectory()) {
         socket.emit("output", `Error: Directory '${targetDir}' does not exist.`);
         return;
       }
-
       workingDirs.set(socket.id, newDir);
       socket.emit("output", `Changed directory to: ${newDir}`);
       socket.emit("current_path", formatWindowsPath(newDir));
@@ -86,11 +83,9 @@ io.on("connection", (socket) => {
 
     let execCmd = cmd;
     if (os.platform() === "win32" && cmd.trim() === "ls") execCmd = "dir";
-
     const parts = execCmd.split(" ");
     const mainCmd = parts[0];
     const args = parts.slice(1);
-
     const child = spawn(mainCmd, args, { cwd: currentDir, shell: true });
 
     child.stdout.on("data", (data) => socket.emit("output", data.toString()));
@@ -108,15 +103,13 @@ io.on("connection", (socket) => {
       return;
     }
     const filePath = path.join(workingDirs.get(socket.id), fileName);
-
     if (!filePath.startsWith(sandboxDir)) {
       socket.emit("output", "Error: Cannot access files outside storage.");
       return;
     }
-
-    fs.readFile(filePath, 'utf8', (err, content) => {
+    fs.readFile(filePath, "utf8", (err, content) => {
       if (err) {
-        if (err.code === 'ENOENT') socket.emit("nano_content", { content: "" });
+        if (err.code === "ENOENT") socket.emit("nano_content", { content: "" });
         else socket.emit("output", `Error: Unable to read file ${fileName}`);
       } else socket.emit("nano_content", { content });
     });
@@ -129,13 +122,11 @@ io.on("connection", (socket) => {
       return;
     }
     const filePath = path.join(workingDirs.get(socket.id), file);
-
     if (!filePath.startsWith(sandboxDir)) {
       socket.emit("output", "Error: Cannot save file outside storage.");
       return;
     }
-
-    fs.writeFile(filePath, content, 'utf8', (err) => {
+    fs.writeFile(filePath, content, "utf8", (err) => {
       if (err) socket.emit("output", `Error: Failed to save file ${file}`);
       else socket.emit("output", `File ${file} saved successfully.`);
     });
@@ -147,26 +138,25 @@ io.on("connection", (socket) => {
 });
 
 function isSafeFileName(fileName) {
-  if (!fileName || typeof fileName !== 'string') return false;
+  if (!fileName || typeof fileName !== "string") return false;
   const safePattern = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};:'",.<>/?\\|`~]+$/;
-  return safePattern.test(fileName) && !fileName.includes('..');
+  return safePattern.test(fileName) && !fileName.includes("..");
 }
 
 function formatWindowsPath(dir) {
   const relativePath = path.relative(sandboxDir, dir);
-  let displayPath = relativePath 
-                    ? `C:\\Storage\\${relativePath.replace(/\//g, "\\")}`
-                    : "C:\\Storage";
-  return displayPath;
+  return relativePath
+    ? `C:\\Storage\\${relativePath.replace(/\//g, "\\")}`
+    : "C:\\Storage";
 }
 
 const PORT = process.env.PORT || 3000;
-
-let host = 'localhost'; 
+let host = "localhost";
 app.use((req, res, next) => {
-  host = req.get('host');
+  host = req.get("host");
   next();
 });
+app.use(express.static(__dirname + "/public"));
 
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
@@ -174,15 +164,9 @@ server.listen(PORT, () => {
 });
 
 setInterval(() => {
-  const [hostname, port] = host.split(':');
-  const options = {
-    hostname: hostname || 'localhost',
-    port: port || PORT,
-    path: '/',
-    method: 'GET'
-  };
-
+  const [hostname, port] = host.split(":");
+  const options = { hostname: hostname || "localhost", port: port || PORT, path: "/", method: "GET" };
   const req = http.request(options, () => {});
-  req.on('error', () => {});
+  req.on("error", () => {});
   req.end();
 }, 60 * 1000);
