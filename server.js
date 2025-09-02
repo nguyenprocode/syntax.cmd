@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
     let currentDir = workingDirs.get(socket.id);
 
     if (cmd.trim().toLowerCase() === "version") {
-      socket.emit("output", `Web version: ${WEB_VERSION}`);
+      socket.emit("output", `Web ${WEB_VERSION}`);
       return;
     }
 
