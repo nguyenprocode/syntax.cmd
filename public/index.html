@@ -94,11 +94,15 @@
       font-family: 'Source Code Pro', monospace;
       font-size: 1rem;
     }
-    .log-line { font-size: 1rem; line-height: 1.5em; word-break: break-word; }
-    .log-line.cmd { color: #7dd3fc; }
-    .log-line.error { color: #f87171; }
-    .log-line.output { color: #ffffff; }
-    .log-line.system { color: #facc15; }
+    .log-line {
+      font-size: 1rem;
+      line-height: 1.5em;
+      word-break: break-word;
+    }
+    .log-line.cmd     { color: #7dd3fc; }
+    .log-line.error   { color: #f87171; }
+    .log-line.output  { color: #ffffff; }
+    .log-line.system  { color: #facc15; }
     .log-line.special { color: #c084fc; }
     @media (max-width: 500px) {
       .console-title { font-size: 0.9rem; }
@@ -130,7 +134,6 @@
     let history = [];
     let historyIndex = -1;
     let currentPath = "C:\\Storage";
-
     function printLine(text, cls = "") {
       const lines = text.split("\n").filter(t => t.trimEnd());
       const fragment = document.createDocumentFragment();
@@ -143,7 +146,6 @@
       terminal.appendChild(fragment);
       terminal.scrollTop = terminal.scrollHeight;
     }
-
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         const cmd = input.value.trim();
@@ -177,7 +179,6 @@
         e.preventDefault();
       }
     });
-
     socket.on("output", (data) => {
       data.split("\n").forEach(line => {
         const t = line.trimEnd();
@@ -191,11 +192,9 @@
         }
       });
     });
-
     socket.on("current_path", (path) => {
       currentPath = path;
     });
-
     socket.on("nano_open", (data) => {
       window.open(`/nano.html?file=${encodeURIComponent(data.file)}`, '_blank');
     });
